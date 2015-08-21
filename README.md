@@ -18,4 +18,4 @@ Taken from [zazukoians/rdf-ext](https://github.com/zazukoians/rdf-ext)
 
 ## Licence
 
-Apache 2
+MIT

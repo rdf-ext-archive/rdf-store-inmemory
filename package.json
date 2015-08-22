@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nicola/rdf-store-inmemory.git"
+    "url": "https://github.com/rdf-ext/rdf-store-inmemory.git"
   },
   "keywords": [
     "rdf-stores",
@@ -19,7 +19,7 @@
   "author": "Nicola Greco <me@nicola.io> (http://nicolagreco.com/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nicola/rdf-store-inmemory/issues"
+    "url": "https://github.com/rdf-ext/rdf-store-inmemory/issues"
   },
-  "homepage": "https://github.com/nicola/rdf-store-inmemory"
+  "homepage": "https://github.com/rdf-ext/rdf-store-inmemory"
 }

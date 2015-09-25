@@ -16,15 +16,15 @@ function InMemoryStore (rdf) {
       graph = graphs[iri];
     }
 
-    callback(graph);
+    callback(null, graph);
   };
 
   this.match = function (iri, subject, predicate, object, callback, limit) {
     this.graph(iri, function (graph) {
       if (!graph) {
-        callback(null);
+        callback();
       } else {
-        callback(graph.match(subject, predicate, object, limit));
+        callback(null, graph.match(subject, predicate, object, limit));
       }
     });
   };
@@ -33,7 +33,7 @@ function InMemoryStore (rdf) {
     graphs[iri] = rdf.createGraph();
     graphs[iri].addAll(graph);
 
-    callback(graph);
+    callback(null, graph);
   };
 
   this.merge = function (iri, graph, callback) {
@@ -43,7 +43,7 @@ function InMemoryStore (rdf) {
       graphs[iri] = graph;
     }
 
-    callback(graph);
+    callback(null, graph);
   };
 
   this.remove = function (iri, graph, callback) {
@@ -51,7 +51,7 @@ function InMemoryStore (rdf) {
       graphs[iri] = rdf.Graph.difference(graphs[iri], graph);
     }
 
-    callback(true);
+    callback();
   };
 
   this.removeMatches = function (iri, subject, predicate, object, callback) {
@@ -59,7 +59,7 @@ function InMemoryStore (rdf) {
       graphs[iri].removeMatches(subject, predicate, object);
     }
 
-    callback(true);
+    callback();
   };
 
   this.delete = function (iri, callback) {
@@ -67,7 +67,7 @@ function InMemoryStore (rdf) {
       delete graphs[iri];
     }
 
-    callback(true);
+    callback();
   };
 
   this.forEach = function (callback) {

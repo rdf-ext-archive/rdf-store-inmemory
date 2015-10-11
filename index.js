@@ -1,80 +1,135 @@
-'use strict';
+function InMemoryStore (options) {
+  options = options || {}
 
-function InMemoryStore (rdf) {
-  var graphs = {};
+  this.rdf = options.rdf || require('rdf-ext')
+  this.graphs = {}
+}
 
-  this.graph = function (iri, callback) {
-    var graph = null;
+InMemoryStore.prototype.add = function (iri, graph, callback) {
+  var self = this
 
-    if (iri === undefined) {
-      graph = rdf.createGraph();
+  callback = callback || function () {}
 
-      this.forEach(function (toAdd) {
-        graph.addAll(toAdd);
-      });
-    } else if (iri in graphs) {
-      graph = graphs[iri];
+  return new Promise(function (resolve) {
+    self.graphs[iri] = self.rdf.createGraph()
+    self.graphs[iri].addAll(graph)
+
+    callback(null, graph)
+    resolve(graph)
+  })
+}
+
+InMemoryStore.prototype.delete = function (iri, callback) {
+  var self = this
+
+  callback = callback || function () {}
+
+  return new Promise(function (resolve) {
+    if (iri in self.graphs) {
+      delete self.graphs[iri]
     }
 
-    callback(null, graph);
-  };
+    callback()
+    resolve()
+  })
+}
 
-  this.match = function (iri, subject, predicate, object, callback, limit) {
-    this.graph(iri, function (graph) {
-      if (!graph) {
-        callback();
-      } else {
-        callback(null, graph.match(subject, predicate, object, limit));
-      }
-    });
-  };
+InMemoryStore.prototype.graph = function (iri, callback) {
+  var self = this
 
-  this.add = function (iri, graph, callback) {
-    graphs[iri] = rdf.createGraph();
-    graphs[iri].addAll(graph);
+  callback = callback || function () {}
 
-    callback(null, graph);
-  };
+  return new Promise(function (resolve) {
+    var graph = null
 
-  this.merge = function (iri, graph, callback) {
-    if (iri in graphs) {
-      graphs[iri].addAll(graph);
+    if (iri) {
+      graph = self.graphs[iri]
     } else {
-      graphs[iri] = graph;
+      graph = self.rdf.createGraph()
+
+      self.forEach(function (toAdd) {
+        graph.addAll(toAdd)
+      })
     }
 
-    callback(null, graph);
-  };
+    callback(null, graph)
+    resolve(graph)
+  })
+}
 
-  this.remove = function (iri, graph, callback) {
-    if (iri in graphs) {
-      graphs[iri] = rdf.Graph.difference(graphs[iri], graph);
+InMemoryStore.prototype.match = function (iri, subject, predicate, object, callback, limit) {
+  var self = this
+
+  callback = callback || function () {}
+
+  return new Promise(function (resolve) {
+    self.graph(iri, function (graph) {
+      if (!graph) {
+        callback()
+        resolve()
+      } else {
+        graph = graph.match(subject, predicate, object, limit)
+
+        callback(null, graph)
+        resolve(graph)
+      }
+    })
+  })
+}
+
+InMemoryStore.prototype.merge = function (iri, graph, callback) {
+  var self = this
+
+  callback = callback || function () {}
+
+  return new Promise(function (resolve) {
+    if (iri in self.graphs) {
+      self.graphs[iri].addAll(graph)
+    } else {
+      self.graphs[iri] = graph
     }
 
-    callback();
-  };
+    callback(null, graph)
+    resolve(graph)
+  })
+}
 
-  this.removeMatches = function (iri, subject, predicate, object, callback) {
-    if (iri in graphs) {
-      graphs[iri].removeMatches(subject, predicate, object);
+InMemoryStore.prototype.remove = function (iri, graph, callback) {
+  var self = this
+
+  callback = callback || function () {}
+
+  return new Promise(function (resolve) {
+    if (iri in self.graphs) {
+      self.graphs[iri] = self.graphs[iri].difference(graph)
     }
 
-    callback();
-  };
+    callback()
+    resolve()
+  })
+}
 
-  this.delete = function (iri, callback) {
-    if (iri in graphs) {
-      delete graphs[iri];
+InMemoryStore.prototype.removeMatches = function (iri, subject, predicate, object, callback) {
+  var self = this
+
+  callback = callback || function () {}
+
+  return new Promise(function (resolve) {
+    if (iri in self.graphs) {
+      self.graphs[iri].removeMatches(subject, predicate, object)
     }
 
-    callback();
-  };
+    callback()
+    resolve()
+  })
+}
 
-  this.forEach = function (callback) {
-    Object.keys(graphs).forEach(function (iri) {
-      callback(graphs[iri], iri);
-    });
-  };
-};
+InMemoryStore.prototype.forEach = function (callback) {
+  var self = this
 
-module.exports = InMemoryStore;
+  Object.keys(self.graphs).forEach(function (iri) {
+    callback(self.graphs[iri], iri)
+  })
+}
+
+module.exports = InMemoryStore

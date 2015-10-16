@@ -1,3 +1,25 @@
+function iriToKey (iri) {
+  if (typeof iri === 'string') {
+    return iri
+  }
+
+  if (typeof iri === 'object' && iri.interfaceName === 'NamedNode') {
+    return iri.nominalValue
+  }
+
+  // default graph
+  if (iri === true) {
+    return iri
+  }
+
+  // all graphs
+  if (!iri) {
+    return null
+  }
+
+  throw new Error('invalid IRI')
+}
+
 function InMemoryStore (options) {
   options = options || {}
 
@@ -8,6 +30,7 @@ function InMemoryStore (options) {
 InMemoryStore.prototype.add = function (iri, graph, callback) {
   var self = this
 
+  iri = iriToKey(iri)
   callback = callback || function () {}
 
   return new Promise(function (resolve) {
@@ -22,6 +45,7 @@ InMemoryStore.prototype.add = function (iri, graph, callback) {
 InMemoryStore.prototype.delete = function (iri, callback) {
   var self = this
 
+  iri = iriToKey(iri)
   callback = callback || function () {}
 
   return new Promise(function (resolve) {
@@ -37,6 +61,7 @@ InMemoryStore.prototype.delete = function (iri, callback) {
 InMemoryStore.prototype.graph = function (iri, callback) {
   var self = this
 
+  iri = iriToKey(iri)
   callback = callback || function () {}
 
   return new Promise(function (resolve) {
@@ -60,6 +85,7 @@ InMemoryStore.prototype.graph = function (iri, callback) {
 InMemoryStore.prototype.match = function (iri, subject, predicate, object, callback, limit) {
   var self = this
 
+  iri = iriToKey(iri)
   callback = callback || function () {}
 
   return new Promise(function (resolve) {
@@ -80,6 +106,7 @@ InMemoryStore.prototype.match = function (iri, subject, predicate, object, callb
 InMemoryStore.prototype.merge = function (iri, graph, callback) {
   var self = this
 
+  iri = iriToKey(iri)
   callback = callback || function () {}
 
   return new Promise(function (resolve) {
@@ -97,6 +124,7 @@ InMemoryStore.prototype.merge = function (iri, graph, callback) {
 InMemoryStore.prototype.remove = function (iri, graph, callback) {
   var self = this
 
+  iri = iriToKey(iri)
   callback = callback || function () {}
 
   return new Promise(function (resolve) {
@@ -112,6 +140,7 @@ InMemoryStore.prototype.remove = function (iri, graph, callback) {
 InMemoryStore.prototype.removeMatches = function (iri, subject, predicate, object, callback) {
   var self = this
 
+  iri = iriToKey(iri)
   callback = callback || function () {}
 
   return new Promise(function (resolve) {

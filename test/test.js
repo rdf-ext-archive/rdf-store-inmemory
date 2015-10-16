@@ -24,6 +24,7 @@ describe('rdf-store-inmemory', function () {
       assert.equal(err, null)
       assert.equal(graph.length, 0)
       assert.equal(Object.keys(store.graphs).length, 1)
+      assert.equal('http://example.org/graph' in store.graphs, true)
 
       done()
     })
@@ -35,6 +36,21 @@ describe('rdf-store-inmemory', function () {
     store.add('http://example.org/graph', rdf.createGraph()).then(function (graph) {
       assert.equal(graph.length, 0)
       assert.equal(Object.keys(store.graphs).length, 1)
+      assert.equal('http://example.org/graph' in store.graphs, true)
+
+      done()
+    }).catch(function (error) {
+      done(error)
+    })
+  })
+
+  it('.add should add a graph to the store with NamedNode as IRI', function (done) {
+    var store = new InMemoryStore()
+
+    store.add(rdf.createNamedNode('http://example.org/graph'), rdf.createGraph()).then(function (graph) {
+      assert.equal(graph.length, 0)
+      assert.equal(Object.keys(store.graphs).length, 1)
+      assert.equal('http://example.org/graph' in store.graphs, true)
 
       done()
     }).catch(function (error) {
@@ -87,6 +103,20 @@ describe('rdf-store-inmemory', function () {
 
     store.add('http://example.org/graph', rdf.createGraph()).then(function () {
       return store.graph('http://example.org/graph')
+    }).then(function (graph) {
+      assert.equal(graph.length, 0)
+
+      done()
+    }).catch(function (error) {
+      done(error)
+    })
+  })
+
+  it('.graph should return the named graph with NamedNode object as IRI', function (done) {
+    var store = new InMemoryStore()
+
+    store.add('http://example.org/graph', rdf.createGraph()).then(function () {
+      return store.graph(rdf.createNamedNode('http://example.org/graph'))
     }).then(function (graph) {
       assert.equal(graph.length, 0)
 

@@ -1,3 +1,6 @@
+var util = require('util')
+var AbstractStore = require('rdf-store-abstract')
+
 function iriToKey (iri) {
   if (typeof iri === 'string') {
     return iri
@@ -25,7 +28,11 @@ function InMemoryStore (options) {
 
   this.rdf = options.rdf || require('rdf-ext')
   this.graphs = {}
+
+  AbstractStore.call(this)
 }
+
+util.inherits(InMemoryStore, AbstractStore)
 
 InMemoryStore.prototype.add = function (iri, graph, callback) {
   var self = this
@@ -72,92 +79,13 @@ InMemoryStore.prototype.graph = function (iri, callback) {
     } else {
       graph = self.rdf.createGraph()
 
-      self.forEach(function (toAdd) {
-        graph.addAll(toAdd)
+      Object.keys(self.graphs).forEach(function (iri) {
+        graph.addAll(self.graphs[iri])
       })
     }
 
     callback(null, graph)
     resolve(graph)
-  })
-}
-
-InMemoryStore.prototype.match = function (iri, subject, predicate, object, callback, limit) {
-  var self = this
-
-  iri = iriToKey(iri)
-  callback = callback || function () {}
-
-  return new Promise(function (resolve) {
-    self.graph(iri, function (graph) {
-      if (!graph) {
-        callback()
-        resolve()
-      } else {
-        graph = graph.match(subject, predicate, object, limit)
-
-        callback(null, graph)
-        resolve(graph)
-      }
-    })
-  })
-}
-
-InMemoryStore.prototype.merge = function (iri, graph, callback) {
-  var self = this
-
-  iri = iriToKey(iri)
-  callback = callback || function () {}
-
-  return new Promise(function (resolve) {
-    if (iri in self.graphs) {
-      self.graphs[iri].addAll(graph)
-    } else {
-      self.graphs[iri] = graph
-    }
-
-    callback(null, graph)
-    resolve(graph)
-  })
-}
-
-InMemoryStore.prototype.remove = function (iri, graph, callback) {
-  var self = this
-
-  iri = iriToKey(iri)
-  callback = callback || function () {}
-
-  return new Promise(function (resolve) {
-    if (iri in self.graphs) {
-      self.graphs[iri] = self.graphs[iri].difference(graph)
-    }
-
-    callback()
-    resolve()
-  })
-}
-
-InMemoryStore.prototype.removeMatches = function (iri, subject, predicate, object, callback) {
-  var self = this
-
-  iri = iriToKey(iri)
-  callback = callback || function () {}
-
-  return new Promise(function (resolve) {
-    if (iri in self.graphs) {
-      self.graphs[iri].removeMatches(subject, predicate, object)
-    }
-
-    callback()
-    resolve()
-  })
-}
-
-InMemoryStore.prototype.forEach = function (callback) {
-  var self = this
-
-  Object.keys(self.graphs).forEach(function (iri) {
-    callback(self.graphs[iri], iri)
   })
 }
 

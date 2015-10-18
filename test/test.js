@@ -1,9 +1,29 @@
-/* global describe, it */
+/* global before, describe, it */
 var assert = require('assert')
 var rdf = require('rdf-ext')
 var InMemoryStore = require('../')
 
 describe('rdf-store-inmemory', function () {
+  var graph1 = rdf.createGraph()
+  var graph2 = rdf.createGraph()
+
+  before(function () {
+    graph1.add(rdf.createTriple(
+      rdf.createNamedNode('http://example.org/subject1'),
+      rdf.createNamedNode('http://example.org/predicate'),
+      rdf.createLiteral('object1')))
+
+    graph1.add(rdf.createTriple(
+      rdf.createNamedNode('http://example.org/subject1'),
+      rdf.createNamedNode('http://example.org/predicate'),
+      rdf.createLiteral('object2')))
+
+    graph2.add(rdf.createTriple(
+      rdf.createNamedNode('http://example.org/subject2'),
+      rdf.createNamedNode('http://example.org/predicate'),
+      rdf.createLiteral('object3')))
+  })
+
   it('should implement the Store interface', function () {
     var store = new InMemoryStore()
 
@@ -140,29 +160,15 @@ describe('rdf-store-inmemory', function () {
 
   it('.graph should use true to access the default graph', function (done) {
     var store = new InMemoryStore()
-    var defaultGraph = rdf.createGraph([
-      rdf.createTriple(
-        rdf.createNamedNode('http://example.org/subject'),
-        rdf.createNamedNode('http://example.org/predicate'),
-        rdf.createLiteral('default')
-      )
-    ])
-    var otherGraph = rdf.createGraph([
-      rdf.createTriple(
-        rdf.createNamedNode('http://example.org/subject'),
-        rdf.createNamedNode('http://example.org/predicate'),
-        rdf.createLiteral('other')
-      )
-    ])
 
     Promise.all([
-      store.add(true, defaultGraph),
-      store.add('http://example.org/graph', otherGraph)
+      store.add(true, graph1),
+      store.add('http://example.org/graph', graph2)
     ]).then(function () {
       return store.graph(true)
     }).then(function (graph) {
-      assert.equal(graph.length, 1)
-      assert(graph.toArray().shift().object.equals('default'))
+      assert.equal(graph.length, 2)
+      assert(graph.toArray().shift().subject.equals('http://example.org/subject1'))
 
       done()
     }).catch(function (error) {
@@ -172,28 +178,14 @@ describe('rdf-store-inmemory', function () {
 
   it('.graph should use null to access all graphs', function (done) {
     var store = new InMemoryStore()
-    var defaultGraph = rdf.createGraph([
-      rdf.createTriple(
-        rdf.createNamedNode('http://example.org/subject'),
-        rdf.createNamedNode('http://example.org/predicate'),
-        rdf.createLiteral('default')
-      )
-    ])
-    var otherGraph = rdf.createGraph([
-      rdf.createTriple(
-        rdf.createNamedNode('http://example.org/subject'),
-        rdf.createNamedNode('http://example.org/predicate'),
-        rdf.createLiteral('other')
-      )
-    ])
 
     Promise.all([
-      store.add(true, defaultGraph),
-      store.add('http://example.org/graph', otherGraph)
+      store.add(true, graph1),
+      store.add('http://example.org/graph', graph2)
     ]).then(function () {
       return store.graph()
     }).then(function (graph) {
-      assert.equal(graph.length, 2)
+      assert.equal(graph.length, 3)
 
       done()
     }).catch(function (error) {

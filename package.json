@@ -23,7 +23,8 @@
   },
   "homepage": "https://github.com/rdf-ext/rdf-store-inmemory",
   "dependencies": {
-    "rdf-ext": "^0.3.0"
+    "rdf-ext": "^0.3.0",
+    "rdf-store-abstract": "^0.1.0"
   },
   "devDependencies": {
     "mocha": "^2.3.3"

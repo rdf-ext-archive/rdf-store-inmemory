@@ -2,14 +2,6 @@ var util = require('util')
 var AbstractStore = require('rdf-store-abstract')
 
 function iriToKey (iri) {
-  if (typeof iri === 'string') {
-    return iri
-  }
-
-  if (typeof iri === 'object' && iri.interfaceName === 'NamedNode') {
-    return iri.nominalValue
-  }
-
   // default graph
   if (iri === true) {
     return iri
@@ -20,7 +12,7 @@ function iriToKey (iri) {
     return null
   }
 
-  throw new Error('invalid IRI')
+  return iri.toString()
 }
 
 function InMemoryStore (options) {

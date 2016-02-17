@@ -1,4 +1,4 @@
-var util = require('util')
+var inherits = require('inherits')
 var AbstractStore = require('rdf-store-abstract')
 
 function iriToKey (iri) {
@@ -24,7 +24,7 @@ function InMemoryStore (options) {
   AbstractStore.call(this)
 }
 
-util.inherits(InMemoryStore, AbstractStore)
+inherits(InMemoryStore, AbstractStore)
 
 InMemoryStore.prototype.add = function (iri, graph, callback) {
   var self = this

@@ -1,3 +1,5 @@
+# This package is no longer maintained and not compatible with the latest RDF-Ext version. Similar functionality can be found in the [rdf-store-dataset](https://github.com/rdf-ext/rdf-store-dataset) package.
+
 # rdf-store-inmemory
 
 [![Build Status](https://travis-ci.org/rdf-ext/rdf-store-inmemory.svg?branch=master)](https://travis-ci.org/rdf-ext/rdf-store-inmemory)
